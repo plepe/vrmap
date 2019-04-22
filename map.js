@@ -167,10 +167,11 @@ function loadScene() {
   loadBuildings();
 
   baseTileID = tileIDFromLatlon(centerPos)
+  clear()
   load({
     centerPos,
     bbox: getBoundingBox()
-  })
+  }, () => {})
 }
 
 function getTagsForXMLFeature(xmlFeature) {

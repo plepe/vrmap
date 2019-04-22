@@ -1,5 +1,6 @@
 {
   "dependencies": {
+    "async": "^2.6.2",
   },
   "devDependencies": {
     "browserify": "^16.2.3",
