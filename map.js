@@ -165,6 +165,12 @@ function loadScene() {
   loadGroundTiles();
   loadTrees();
   loadBuildings();
+
+  baseTileID = tileIDFromLatlon(centerPos)
+  load({
+    centerPos,
+    bbox: getBoundingBox()
+  })
 }
 
 function getTagsForXMLFeature(xmlFeature) {
@@ -184,6 +190,19 @@ function getBoundingBoxString() {
                                  y: baseTileID.y - tilesFromCenter});
   return startPos.latitude + "," + startPos.longitude + "," +
          endPos.latitude + "," + endPos.longitude;
+}
+
+function getBoundingBox() {
+  var startPos = latlonFromTileID({x: baseTileID.x - tilesFromCenter,
+                                   y: baseTileID.y + tilesFromCenter + 1});
+  var endPos = latlonFromTileID({x: baseTileID.x + tilesFromCenter + 1,
+                                 y: baseTileID.y - tilesFromCenter});
+  return {
+    minlat: startPos.latitude,
+    minlon: startPos.longitude,
+    maxlat: endPos.latitude,
+    maxlon: endPos.longitude
+  }
 }
 
 function fetchFromOverpass(opQuery) {
