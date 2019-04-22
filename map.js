@@ -2,7 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this file,
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-var tileZoom = 19;
+var tileZoom = 18;
 var presetsFile = "presets.json";
 var centerPos;
 var map, tiles, items;
@@ -15,8 +15,11 @@ var tileServer = "https://tilecache.kairo.at/mapnik/";
 //var tileServer = "https://tilecache.kairo.at/basemaphires/";
 // Standard Overpass API Server
 var overpassURL = "https://overpass-api.de/api/interpreter";
+var overpassFrontend;
 
 window.onload = function() {
+  overpassFrontend = new OverpassFrontend(overpassURL);
+
   // Close intro dialog on clicking its button.
   document.querySelector("#introDialogCloseButton").onclick = event => {
     event.target.parentElement.parentElement.classList.add("hidden");
@@ -163,14 +166,14 @@ function loadScene() {
   while (items.firstChild) { items.removeChild(items.firstChild); }
   document.querySelector("#cameraRig").object3D.position.set(0, 0, 0);
   loadGroundTiles();
-  loadTrees();
-  loadBuildings();
+//  loadTrees();
 
   baseTileID = tileIDFromLatlon(centerPos)
+  clear()
   load({
     centerPos,
     bbox: getBoundingBox()
-  })
+  }, () => {})
 }
 
 function getTagsForXMLFeature(xmlFeature) {
