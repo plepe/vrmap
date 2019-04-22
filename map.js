@@ -207,7 +207,10 @@ function getBoundingBox() {
 
 function fetchFromOverpass(opQuery) {
   return new Promise((resolve, reject) => {
-    fetch(overpassURL + "?data=" + encodeURIComponent(opQuery))
+    fetch(overpassURL, {
+      method: 'POST',
+      body: opQuery
+    })
     .then((response) => {
       if (response.ok) {
         return response.text();
