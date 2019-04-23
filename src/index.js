@@ -1,3 +1,7 @@
+require('aframe')
+require('aframe-animation-component')
+require('aframe-teleport-controls')
+
 const async = {
   each: require('async/each')
 }
