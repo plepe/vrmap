@@ -9,7 +9,7 @@ module.exports = {
       '(way[railway=tram];)',
       context.bbox,
       {
-        properties: OverpassFrontend.GEOM | OverpassFrontend.MEMBERS
+        properties: OverpassFrontend.GEOM | OverpassFrontend.MEMBERS | OverpassFrontend.TAGS
       },
       (err, feature) => {
         this.addItem(feature.GeoJSON(), context)
@@ -19,22 +19,38 @@ module.exports = {
   },
 
   addItem (feature, context) {
-    let geom = context.convertFromGeoJSON(feature)
-    if (!geom.geometry) {
+    if (!feature.geometry) {
       console.log(feature)
       return
     }
 
+    let gauge = feature.properties.gauge || 1435
+
+    let metaitem = document.createElement('a-entity')
+
+    let shifted = turf.lineOffset(feature, gauge / 2000, { units: 'meters' })
+    let geom = context.convertFromGeoJSON(shifted)
     geom = geom.geometry.coordinates
+    let item = document.createElement('a-tube')
+    item.setAttribute('class', 'tracks')
+    item.setAttribute('path', geom.map(pos => pos.x + ' 0 ' + pos.z).join(', '))
+    item.setAttribute('radius', 0.05)
+    item.setAttribute('material', { color: '#404040' })
+    item.setAttribute('segments', geom.length * 2)
+    metaitem.appendChild(item)
 
-    let item = document.createElement("a-tube")
-    item.setAttribute("class", "tracks")
-    item.setAttribute("path", geom.map(pos => pos.x + " 0 " + pos.z).join(", "))
+    shifted = turf.lineOffset(feature, -gauge / 2000, { units: 'meters' })
+    geom = context.convertFromGeoJSON(shifted)
+    geom = geom.geometry.coordinates
+    item = document.createElement('a-tube')
+    item.setAttribute('class', 'tracks')
+    item.setAttribute('path', geom.map(pos => pos.x + ' 0 ' + pos.z).join(', '))
+    item.setAttribute('radius', 0.05)
+    item.setAttribute('material', { color: '#404040' })
+    item.setAttribute('segments', geom.length * 2)
+    metaitem.appendChild(item)
 
-    item.setAttribute("radius", 0.05)
-    item.setAttribute("material", { color: '#404040' })
-
-    global.items.appendChild(item)
+    global.items.appendChild(metaitem)
   },
 
   clear () {
