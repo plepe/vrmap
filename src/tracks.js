@@ -1,5 +1,4 @@
 const turf = require('@turf/turf')
-require('aframe-extras');
 
 module.exports = {
   init () {
@@ -26,27 +25,16 @@ module.exports = {
       return
     }
 
-    geom = geom.geometry.coordinates.map(pos => getPositionFromTilepos(pos))
+    geom = geom.geometry.coordinates
 
-    let item = document.createElement("a-entity")
+    let item = document.createElement("a-tube")
     item.setAttribute("class", "tracks")
+    item.setAttribute("path", geom.map(pos => pos.x + " 0 " + pos.z).join(", "))
 
-    item.setAttribute("geometry", {primitive: "tube", radius: 1, "path": geom.map(pos => Math.floor(pos.x) + " 1 " + Math.floor(pos.z)).join(", ") })
+    item.setAttribute("radius", 0.05)
+    item.setAttribute("material", { color: '#404040' })
 
-    console.log(item)
     global.items.appendChild(item)
-
-//
-//    let data = getBuildingData(feature)
-//    let buildingProperties = data.properties
-//    buildingProperties.outerPoints = outerPoints
-//    if (innerWays.length) {
-//      buildingProperties.innerPaths = innerWays;
-//    }
-//    
-//    item.setAttribute("geometry", buildingProperties);
-//    item.setAttribute("material", {color: data.color})
-//    item.setAttribute("position", getPositionFromTilepos(itemPos))
   },
 
   clear () {

@@ -5,7 +5,7 @@ const async = {
 const Context = require('./Context')
 
 const modules = [
-  //require('./buildings'),
+  require('./buildings'),
   require('./tracks')
 ]
 
