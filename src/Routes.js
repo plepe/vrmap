@@ -181,3 +181,15 @@ module.exports = class Routes extends OverpassLayer {
     }
   }
 }
+
+AFRAME.registerGeometry('vehicle', {
+  schema: {
+    frontPos: { default: 0, min: 0 },
+    linestring: {}
+  },
+
+  init: function (data) {
+    console.log('here', data)
+    this.geometry = new THREE.BoxGeometry()
+  }
+})
