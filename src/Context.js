@@ -51,6 +51,15 @@ class Context {
 
     if (feature.geometry) {
       switch (feature.geometry.type) {
+        case 'Point':
+          result.geometry = {
+            type: feature.geometry.type,
+            coordinates: this.worldposFromLatlon({
+              longitude: feature.geometry.coordinates[0],
+              latitude: feature.geometry.coordinates[1]
+            })
+          }
+          break
         case 'LineString':
           result.geometry = {
             type: feature.geometry.type,
