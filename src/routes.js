@@ -2,12 +2,16 @@ const turf = require('@turf/turf')
 const md5 = require('md5')
 
 let routes = []
-let distance = 0.1
 
 class Route {
   constructor (feature, context) {
     this.feature = feature
     this.context = context
+
+    // settings
+    this.interval = 60 // every n seconds
+    this.speed = 0.005 // kilometer / second
+    this.color = this.feature.tags.color || '#' + md5(this.feature.tags.ref).slice(0, 6)
 
     // make sure that all route members are fully loaded (including connections to prev/next way)
     let routeWayIds = []
@@ -65,7 +69,7 @@ class Route {
     let coordinates = this.context.convertFromGeoJSON(turf.along(this.routeJsonFeature, pos)).geometry.coordinates
     item.setAttribute('position', coordinates.x + ' 1 ' + coordinates.z)
     item.setAttribute('radius', 1.5)
-    item.setAttribute('material', { color: '#' + md5(this.feature.tags.ref).slice(0, 6) })
+    item.setAttribute('material', { color: this.color })
 
     this.vehicles.push({
       item,
@@ -75,7 +79,7 @@ class Route {
     global.items.appendChild(item)
   }
 
-  moveVehicles () {
+  moveVehicles (elapsed) {
     if (this.routeLength === undefined) {
       return
     }
@@ -83,7 +87,7 @@ class Route {
     let minPos = this.routeLength
 
     this.vehicles.forEach((vehicle, i) => {
-      vehicle.pos += 0.001
+      vehicle.pos += elapsed * this.speed
 
       if (vehicle.pos < minPos) {
         minPos = vehicle.pos
@@ -99,7 +103,8 @@ class Route {
       vehicle.item.setAttribute('position', coordinates.x + ' 1 ' + coordinates.z)
     })
 
-    for (let i = 0; i < minPos - distance; i += distance) {
+    let distance = this.interval * this.speed
+    for (let i = minPos - distance; i >= 0; i -= distance) {
       this.addVehicle(i)
     }
   }
@@ -133,6 +138,13 @@ module.exports = {
   },
 
   update () {
-    routes.forEach(route => route.moveVehicles())
+    let time = new Date().getTime()
+    let elapsed = 0
+    if (this.lastUpdateTime) {
+      elapsed = (time - this.lastUpdateTime) / 1000
+    }
+    this.lastUpdateTime = time
+
+    routes.forEach(route => route.moveVehicles(elapsed))
   }
 }
