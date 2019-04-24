@@ -66,17 +66,35 @@ class Route {
   addVehicle (pos) {
     let item = document.createElement('a-sphere')
     item.setAttribute('class', 'vehicle')
-    let coordinates = this.context.convertFromGeoJSON(turf.along(this.routeJsonFeature, pos)).geometry.coordinates
-    item.setAttribute('position', coordinates.x + ' 1 ' + coordinates.z)
     item.setAttribute('radius', 1.5)
     item.setAttribute('material', { color: this.color })
 
-    this.vehicles.push({
+    let vehicle = {
       item,
-      pos
-    })
+      pos,
+      visible: false
+    }
+    this.vehicles.push(vehicle)
+    this.updateVehicle(vehicle)
+  }
 
-    global.items.appendChild(item)
+  updateVehicle (vehicle) {
+    let latlon = turf.along(this.routeJsonFeature, vehicle.pos)
+
+    if (this.context.bbox.intersects(latlon)) {
+      let coordinates = this.context.convertFromGeoJSON(latlon).geometry.coordinates
+      vehicle.item.setAttribute('position', coordinates.x + ' 1 ' + coordinates.z)
+
+      if (!vehicle.visible) {
+        global.items.appendChild(vehicle.item)
+        vehicle.visible = true
+      }
+    } else {
+      if (vehicle.visible) {
+        global.items.removeChild(vehicle.item)
+        vehicle.visible = false
+      }
+    }
   }
 
   moveVehicles (elapsed) {
@@ -94,13 +112,15 @@ class Route {
       }
 
       if (vehicle.pos > this.routeLength) {
-        global.items.removeChild(vehicle.item)
+        if (vehicle.visible) {
+          global.items.removeChild(vehicle.item)
+        }
+
         this.vehicles.splice(i, 1)
         return
       }
 
-      let coordinates = this.context.convertFromGeoJSON(turf.along(this.routeJsonFeature, vehicle.pos)).geometry.coordinates
-      vehicle.item.setAttribute('position', coordinates.x + ' 1 ' + coordinates.z)
+      this.updateVehicle(vehicle)
     })
 
     let distance = this.interval * this.speed
