@@ -1,4 +1,5 @@
 const turf = require('@turf/turf')
+const md5 = require('md5')
 
 let routes = []
 let distance = 0.1
@@ -64,7 +65,7 @@ class Route {
     let coordinates = this.context.convertFromGeoJSON(turf.along(this.routeJsonFeature, pos)).geometry.coordinates
     item.setAttribute('position', coordinates.x + ' 1 ' + coordinates.z)
     item.setAttribute('radius', 1.5)
-    item.setAttribute('material', { color: 'red' })
+    item.setAttribute('material', { color: '#' + md5(this.feature.tags.ref).slice(0, 6) })
 
     this.vehicles.push({
       item,
