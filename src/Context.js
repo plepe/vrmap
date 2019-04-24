@@ -37,6 +37,24 @@ class Context {
     }
   }
 
+  latlonFromWorldpos (pos) {
+    if (!centerOffset) {
+      centerOffset = tileposFromLatlon(centerPos);
+    }
+
+    var xtilepos = pos.x / baseTileSize + baseTileID.x + centerOffset.x
+    var ytilepos = pos.z / baseTileSize + baseTileID.y + centerOffset.y
+
+    var n = Math.pow(2, tileZoom);
+
+    var latRad = Math.atan(Math.sinh(Math.PI * (1 - 2 * ytilepos / n)))
+
+    return {
+      longitude: xtilepos / n * 360 - 180,
+      latitude: latRad * 180 / Math.PI
+    }
+  }
+
   getRelativePositionFromWorldpos (worldpos, reference) {
     return {
       x: worldpos.x - reference.x,

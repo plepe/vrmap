@@ -20,6 +20,8 @@ var overpassFrontend;
 window.onload = function() {
   overpassFrontend = new OverpassFrontend(overpassURL);
 
+  init()
+
   // Close intro dialog on clicking its button.
   document.querySelector("#introDialogCloseButton").onclick = event => {
     event.target.parentElement.parentElement.classList.add("hidden");
