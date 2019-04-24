@@ -1,4 +1,5 @@
 /* global tileZoom, baseTileID, baseTileSize, tileposFromLatlon, centerPos */
+const BoundingBox = require('boundingbox')
 
 let centerOffset
 
@@ -7,6 +8,7 @@ class Context {
     for (var k in param) {
       this[k] = param[k]
     }
+    this.bbox = new BoundingBox(this.bbox)
   }
 
   tileIDFromLatlon (latlon) {
