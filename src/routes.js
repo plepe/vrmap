@@ -1,16 +1,38 @@
 const turf = require('@turf/turf')
 
 let routes = []
+let distance = 0.1
 
 class Route {
   constructor (feature, context) {
     this.feature = feature
     this.context = context
 
+    // make sure that all route members are fully loaded (including connections to prev/next way)
+    let routeWayIds = []
+    feature.members.forEach(
+      member => {
+        if (member.role === '' && member.type === 'way') {
+          routeWayIds.push(member.id)
+        }
+      }
+    )
+
+    overpassFrontend.get(
+      routeWayIds,
+      {
+        properties: OverpassFrontend.MEMBERS
+      },
+      () => {},
+      () => this.init()
+    )
+  }
+
+  init () {
     let routeFeatures = []
     let routeGeom = []
 
-    feature.members.forEach(
+    this.feature.members.forEach(
       member => {
         if (member.role === '' && member.type === 'way') {
           routeFeatures.push(member)
@@ -41,7 +63,7 @@ class Route {
     item.setAttribute('class', 'vehicle')
     let coordinates = this.context.convertFromGeoJSON(turf.along(this.routeJsonFeature, pos)).geometry.coordinates
     item.setAttribute('position', coordinates.x + ' 1 ' + coordinates.z)
-    item.setAttribute('radius', 10)
+    item.setAttribute('radius', 1.5)
     item.setAttribute('material', { color: 'red' })
 
     this.vehicles.push({
@@ -53,6 +75,10 @@ class Route {
   }
 
   moveVehicles () {
+    if (this.routeLength === undefined) {
+      return
+    }
+
     let minPos = this.routeLength
 
     this.vehicles.forEach((vehicle, i) => {
@@ -72,7 +98,7 @@ class Route {
       vehicle.item.setAttribute('position', coordinates.x + ' 1 ' + coordinates.z)
     })
 
-    for (let i = 0; i < minPos - 1; i += 1) {
+    for (let i = 0; i < minPos - distance; i += distance) {
       this.addVehicle(i)
     }
   }
@@ -87,10 +113,7 @@ module.exports = {
       'relation[route=tram]',
       context.bbox,
       {
-        properties: OverpassFrontend.GEOM | OverpassFrontend.MEMBERS | OverpassFrontend.TAGS,
-        members: true,
-        memberCallback: () => {},
-        memberProperties: OverpassFrontend.MEMBERS | OverpassFrontend.TAGS
+        properties: OverpassFrontend.GEOM | OverpassFrontend.MEMBERS | OverpassFrontend.TAGS
       },
       (err, feature) => {
         this.addItem(feature, context)
