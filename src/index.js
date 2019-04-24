@@ -7,7 +7,8 @@ const Context = require('./Context')
 const modules = [
   require('./buildings'),
   require('./trees'),
-  require('./tracks')
+  require('./tracks'),
+  require('./routes')
 ]
 
 global.init = () => {
