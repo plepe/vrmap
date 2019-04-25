@@ -128,30 +128,75 @@ class Route {
       this.addVehicle(i)
     }
   }
+
+  remove () {
+    this.vehicles.forEach(vehicle => {
+      if (vehicle.visible) {
+        global.items.removeChild(vehicle.item)
+      }
+    })
+
+    delete this.vehicles
+  }
 }
+
+let request
+let features = {}
 
 module.exports = {
   init () {
+    window.setInterval(() => this.update(), 20)
   },
 
   load (context, callback) {
-    overpassFrontend.BBoxQuery(
+    let found = {}
+
+    if (request) {
+      request.abort()
+    }
+
+    request = overpassFrontend.BBoxQuery(
       'relation[route=tram]',
       context.bbox,
       {
         properties: OverpassFrontend.GEOM | OverpassFrontend.MEMBERS | OverpassFrontend.TAGS
       },
       (err, feature) => {
-        this.addItem(feature, context)
-      },
-      callback
-    )
+        if (err) {
+          return console.error(err)
+        }
 
-    window.setInterval(() => this.update(), 20)
+        if (!(feature.id in features)) {
+          features[feature.id] = {
+            feature,
+            data: this.addFeature(feature, context)
+          }
+        }
+
+        found[feature.id] = true
+      },
+      (err) => {
+        request = null
+
+        for (let k in features) {
+          if (!(k in found)) {
+            this.removeFeature(features[k].feature, features[k].data)
+            delete features[k]
+          }
+        }
+
+        callback(err)
+      }
+    )
   },
 
-  addItem (feature, context) {
-    routes.push(new Route(feature, context))
+  addFeature (feature, context) {
+    return routes[feature.id] = new Route(feature, context)
+  },
+
+  removeFeature (feature, route) {
+    route.remove()
+    delete routes[feature.id]
   },
 
   clear () {
@@ -165,6 +210,8 @@ module.exports = {
     }
     this.lastUpdateTime = time
 
-    routes.forEach(route => route.moveVehicles(elapsed))
+    for (var k in routes) {
+      routes[k].moveVehicles(elapsed)
+    }
   }
 }

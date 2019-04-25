@@ -17,13 +17,22 @@ var specialDefaults = {
   water_tower: { 'height': 20 }
 }
 
+let request
+let items = {}
+
 module.exports = {
   init () {
   },
 
   load (context, callback) {
-    overpassFrontend.BBoxQuery(
-      '(way[building];)',
+    let found = {}
+
+    if (request) {
+      request.abort()
+    }
+
+    request = overpassFrontend.BBoxQuery(
+      '(way[building];relation[building];)',
       context.bbox,
       {
         properties: OverpassFrontend.GEOM | OverpassFrontend.MEMBERS | OverpassFrontend.TAGS
@@ -33,14 +42,29 @@ module.exports = {
           return console.error(err)
         }
 
-        this.addItem(feature.GeoJSON(), context)
+        if (!(feature.id in items)) {
+          this.addItem(feature, context)
+        }
+
+        found[feature.id] = true
       },
-      callback
+      (err) => {
+        request = null
+
+        for (let k in items) {
+          if (!(k in found)) {
+            global.items.removeChild(items[k])
+            delete items[k]
+          }
+        }
+
+        callback(err)
+      }
     )
   },
 
   addItem (feature, context) {
-    let geom = context.convertFromGeoJSON(feature)
+    let geom = context.convertFromGeoJSON(feature.GeoJSON())
     if (!geom.geometry) {
       console.log(feature)
       return
@@ -87,14 +111,16 @@ module.exports = {
     item.setAttribute('position', itemPos)
 
     global.items.appendChild(item)
+
+    items[feature.id] = item
   },
 
   clear () {
   }
 }
 
-function getBuildingData (jsonFeature) {
-  var tags = jsonFeature.properties.tags ? jsonFeature.properties.tags : jsonFeature.properties
+function getBuildingData (feature) {
+  var tags = feature.tags || {}
   var btype = tags.building
   if (tags.shelter === 'yes') { btype = 'shelter' }
   if (ignoredTypes.includes(btype)) { return null }

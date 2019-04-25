@@ -32,7 +32,9 @@ global.init = () => {
 }
 
 global.load = (param, callback) => {
-  context = new Context(param)
+  if (!context) {
+    context = new Context(param)
+  }
 
   async.each(modules,
     (module, callback) => module.load(context, callback),
@@ -59,9 +61,14 @@ function getBBox () {
 }
 
 function update () {
-  context.bbox = getBBox()
-  console.log(JSON.stringify(context.bbox))
-  load()
+  context.viewArea = getBBox()
+  let bbox = turf.bbox(context.viewArea)
+  context.bbox.minlon = bbox[0]
+  context.bbox.minlat = bbox[1]
+  context.bbox.maxlon = bbox[2]
+  context.bbox.maxlat = bbox[3]
+
+  load(null, () => {})
 }
 
 global.clear = () => {
@@ -71,6 +78,10 @@ global.clear = () => {
 AFRAME.registerComponent('camera-listener', {
   tick () {
     worldPos.setFromMatrixPosition(camera.object3D.matrixWorld)
+    if (worldPos === undefined) {
+      return
+    }
+
     rotation = camera.getAttribute('rotation')
     const newWorldPos = AFRAME.utils.coordinates.stringify(worldPos)
     const newRotation = AFRAME.utils.coordinates.stringify(rotation)

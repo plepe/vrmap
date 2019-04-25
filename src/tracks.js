@@ -1,20 +1,48 @@
 const turf = require('@turf/turf')
 
+let request
+let items = {}
+
 module.exports = {
   init () {
   },
 
   load (context, callback) {
-    overpassFrontend.BBoxQuery(
+    let found = {}
+
+    if (request) {
+      request.abort()
+    }
+
+    request = overpassFrontend.BBoxQuery(
       '(way[railway=tram];)',
       context.bbox,
       {
         properties: OverpassFrontend.GEOM | OverpassFrontend.MEMBERS | OverpassFrontend.TAGS
       },
       (err, feature) => {
-        this.addItem(feature.GeoJSON(), context)
+        if (err) {
+          return console.error(err)
+        }
+
+        if (!(feature.id in items)) {
+          this.addItem(feature, context)
+        }
+
+        found[feature.id] = true
       },
-      callback
+      (err) => {
+        request = null
+
+        for (let k in items) {
+          if (!(k in found)) {
+            global.items.removeChild(items[k])
+            delete items[k]
+          }
+        }
+
+        callback(err)
+      }
     )
   },
 
@@ -24,11 +52,12 @@ module.exports = {
       return
     }
 
-    let gauge = feature.properties.gauge || 1435
+    let geojson = feature.GeoJSON()
+    let gauge = feature.tags.gauge || 1435
 
     let metaitem = document.createElement('a-entity')
 
-    let shifted = turf.lineOffset(feature, gauge / 2000, { units: 'meters' })
+    let shifted = turf.lineOffset(geojson, gauge / 2000, { units: 'meters' })
     let geom = context.convertFromGeoJSON(shifted)
     geom = geom.geometry.coordinates
     let item = document.createElement('a-tube')
@@ -39,7 +68,7 @@ module.exports = {
     item.setAttribute('segments', geom.length * 2)
     metaitem.appendChild(item)
 
-    shifted = turf.lineOffset(feature, -gauge / 2000, { units: 'meters' })
+    shifted = turf.lineOffset(geojson, -gauge / 2000, { units: 'meters' })
     geom = context.convertFromGeoJSON(shifted)
     geom = geom.geometry.coordinates
     item = document.createElement('a-tube')
@@ -51,6 +80,8 @@ module.exports = {
     metaitem.appendChild(item)
 
     global.items.appendChild(metaitem)
+
+    items[feature.id] = metaitem
   },
 
   clear () {
