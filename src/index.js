@@ -1,8 +1,10 @@
+const turf = require('@turf/turf')
 const async = {
   each: require('async/each')
 }
 
 const Context = require('./Context')
+const pointToGeoJSON = require('./pointToGeoJSON')
 
 const modules = [
   require('./buildings'),
@@ -16,6 +18,10 @@ let camera
 let cameraPos
 let worldPos, oldWorldPos
 let rotation, oldRotation
+
+let viewAngle = 70
+let viewDistance = 500 // m
+let viewBuffer = 100 // m
 
 global.init = () => {
   modules.forEach(module => module.init())
@@ -34,8 +40,28 @@ global.load = (param, callback) => {
   )
 }
 
+function getBBox () {
+  let cameraGeoJSON = pointToGeoJSON(cameraPos)
+  let viewArea = {
+    type: 'Feature',
+    geometry: {
+      type: 'Polygon',
+      coordinates: [ [
+        cameraGeoJSON.geometry.coordinates,
+        turf.transformTranslate(cameraGeoJSON, viewDistance / 1000, - cameraPos.heading + viewAngle / 2).geometry.coordinates,
+        turf.transformTranslate(cameraGeoJSON, viewDistance / 1000, - cameraPos.heading - viewAngle / 2).geometry.coordinates,
+        cameraGeoJSON.geometry.coordinates
+      ] ]
+    }
+  }
+
+  return turf.buffer(viewArea, viewBuffer / 1000)
+}
+
 function update () {
-  console.log(cameraPos)
+  context.bbox = getBBox()
+  console.log(JSON.stringify(context.bbox))
+  load()
 }
 
 global.clear = () => {
