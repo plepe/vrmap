@@ -134,6 +134,11 @@ class Route {
   }
 
   remove () {
+    if (!this.vehicles) {
+      console.log('why is vehicles undefined?')
+      return
+    }
+
     this.vehicles.forEach(vehicle => {
       if (vehicle.visible) {
         global.items.removeChild(vehicle.item)
