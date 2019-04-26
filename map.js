@@ -165,12 +165,9 @@ function toggleMenu(event) {
 }
 
 function loadScene() {
-  while (tiles.firstChild) { tiles.removeChild(tiles.firstChild); }
-  clear();
   document.querySelector("#cameraRig").object3D.position.set(0, 0, 0);
-  loadGroundTiles();
 
-  baseTileID = tileIDFromLatlon(centerPos)
+  initScene()
 }
 
 function getTagsForXMLFeature(xmlFeature) {

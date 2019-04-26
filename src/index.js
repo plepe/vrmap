@@ -9,6 +9,7 @@ const Context = require('./Context')
 const pointToGeoJSON = require('./pointToGeoJSON')
 
 const modules = [
+  require('./Tiles'),
   require('./Buildings'),
   require('./Trees'),
   require('./Tracks'),
@@ -28,7 +29,9 @@ let viewBuffer = 100 // m
 
 global.init = () => {
   if (!context) {
-    context = new Context({})
+    context = new Context({
+      centerPos
+    })
   }
 
   modules.forEach(Module => {
@@ -45,6 +48,17 @@ function load (callback) {
     (layer, callback) => layer.load(callback),
     callback
   )
+}
+
+global.initScene = () => {
+  context.centerPos = centerPos
+
+  baseTileID = context.tileIDFromLatlon(context.centerPos)
+  baseTileSize = tilesizeFromID(baseTileID)
+
+  clear()
+  cameraListener(true)
+  load(() => {})
 }
 
 global.clear = () => {
@@ -70,6 +84,7 @@ function getBBox () {
 }
 
 function update () {
+  context.cameraPos = cameraPos
   context.viewArea = getBBox()
   let bbox = turf.bbox(context.viewArea)
   context.bbox.minlon = bbox[0]
@@ -82,27 +97,31 @@ function update () {
 
 AFRAME.registerComponent('camera-listener', {
   tick () {
-    if (worldPos === undefined) {
-      return
-    }
-
-    worldPos.setFromMatrixPosition(camera.object3D.matrixWorld)
-
-    rotation = camera.getAttribute('rotation')
-    const newWorldPos = AFRAME.utils.coordinates.stringify(worldPos)
-    const newRotation = AFRAME.utils.coordinates.stringify(rotation)
-
-    if (oldWorldPos !== newWorldPos || oldRotation !== newRotation) {
-      cameraPos = context.latlonFromWorldpos(worldPos)
-      cameraPos.heading = rotation.y % 360
-      if (cameraPos.angle < 0) {
-        cameraPos.heading += 360
-      }
-
-      update()
-
-      oldWorldPos = newWorldPos
-      oldRotation = newRotation
-    }
+    cameraListener()
   }
 })
+
+function cameraListener (force=false) {
+  if (worldPos === undefined) {
+    return
+  }
+
+  worldPos.setFromMatrixPosition(camera.object3D.matrixWorld)
+
+  rotation = camera.getAttribute('rotation')
+  const newWorldPos = AFRAME.utils.coordinates.stringify(worldPos)
+  const newRotation = AFRAME.utils.coordinates.stringify(rotation)
+
+  if (force || oldWorldPos !== newWorldPos || oldRotation !== newRotation) {
+    cameraPos = context.latlonFromWorldpos(worldPos)
+    cameraPos.heading = rotation.y % 360
+    if (cameraPos.angle < 0) {
+      cameraPos.heading += 360
+    }
+
+    update()
+
+    oldWorldPos = newWorldPos
+    oldRotation = newRotation
+  }
+}
