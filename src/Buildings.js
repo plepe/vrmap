@@ -1,4 +1,5 @@
-/* global OverpassFrontend, overpassFrontend, AFRAME, THREE */
+/* global AFRAME, THREE */
+const OverpassLayer = require('./OverpassLayer')
 
 var metersPerLevel = 3
 var roofOnlyTypes = ['roof', 'carport', 'grandstand']
@@ -17,54 +18,14 @@ var specialDefaults = {
   water_tower: { 'height': 20 }
 }
 
-let request
-let items = {}
+module.exports = class Buildings extends OverpassLayer {
+  constructor (view) {
+    super(view)
+    this.query = '(way[building];relation[building];)'
+  }
 
-module.exports = {
-  init () {
-  },
-
-  load (context, callback) {
-    let found = {}
-
-    if (request) {
-      request.abort()
-    }
-
-    request = overpassFrontend.BBoxQuery(
-      '(way[building];relation[building];)',
-      context.bbox,
-      {
-        properties: OverpassFrontend.GEOM | OverpassFrontend.MEMBERS | OverpassFrontend.TAGS
-      },
-      (err, feature) => {
-        if (err) {
-          return console.error(err)
-        }
-
-        if (!(feature.id in items)) {
-          this.addItem(feature, context)
-        }
-
-        found[feature.id] = true
-      },
-      (err) => {
-        request = null
-
-        for (let k in items) {
-          if (!(k in found)) {
-            global.items.removeChild(items[k])
-            delete items[k]
-          }
-        }
-
-        callback(err)
-      }
-    )
-  },
-
-  addItem (feature, context) {
-    let geom = context.convertFromGeoJSON(feature.GeoJSON())
+  addFeature (feature) {
+    let geom = this.view.convertFromGeoJSON(feature.GeoJSON())
     if (!geom.geometry) {
       console.log(feature)
       return
@@ -82,7 +43,7 @@ module.exports = {
     for (let way of geom.geometry.coordinates) {
       let wayPoints = []
       for (let tpos of way) {
-        let ppos = context.getRelativePositionFromWorldpos(tpos, itemPos)
+        let ppos = this.view.getRelativePositionFromWorldpos(tpos, itemPos)
         wayPoints.push({ x: ppos.x, y: ppos.z })
       }
       if (!outerPoints.length) {
@@ -109,13 +70,13 @@ module.exports = {
     item.setAttribute('geometry', buildingProperties)
     item.setAttribute('material', { color: data.color })
     item.setAttribute('position', itemPos)
-
     global.items.appendChild(item)
 
-    items[feature.id] = item
-  },
+    return item
+  }
 
-  clear () {
+  removeFeature (feature, item) {
+    global.items.appendChild(item)
   }
 }
 

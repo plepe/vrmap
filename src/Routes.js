@@ -1,5 +1,9 @@
+/* global OverpassFrontend, overpassFrontend, AFRAME, THREE */
+
 const turf = require('@turf/turf')
 const md5 = require('md5')
+
+const OverpassLayer = require('./OverpassLayer')
 
 let routes = []
 
@@ -140,67 +144,24 @@ class Route {
   }
 }
 
-let request
-let features = {}
-
-module.exports = {
-  init () {
+module.exports = class Routes extends OverpassLayer {
+  constructor (view) {
+    super(view)
     window.setInterval(() => this.update(), 20)
-  },
+    this.query = 'relation[route=tram]'
+  }
 
-  load (context, callback) {
-    let found = {}
-
-    if (request) {
-      request.abort()
-    }
-
-    request = overpassFrontend.BBoxQuery(
-      'relation[route=tram]',
-      context.bbox,
-      {
-        properties: OverpassFrontend.GEOM | OverpassFrontend.MEMBERS | OverpassFrontend.TAGS
-      },
-      (err, feature) => {
-        if (err) {
-          return console.error(err)
-        }
-
-        if (!(feature.id in features)) {
-          features[feature.id] = {
-            feature,
-            data: this.addFeature(feature, context)
-          }
-        }
-
-        found[feature.id] = true
-      },
-      (err) => {
-        request = null
-
-        for (let k in features) {
-          if (!(k in found)) {
-            this.removeFeature(features[k].feature, features[k].data)
-            delete features[k]
-          }
-        }
-
-        callback(err)
-      }
-    )
-  },
-
-  addFeature (feature, context) {
-    return routes[feature.id] = new Route(feature, context)
-  },
+  addFeature (feature) {
+    super.addFeature(feature)
+    routes[feature.id] = new Route(feature, this.view)
+    return routes[feature.id]
+  }
 
   removeFeature (feature, route) {
+    super.removeFeature(feature, route)
     route.remove()
     delete routes[feature.id]
-  },
-
-  clear () {
-  },
+  }
 
   update () {
     let time = new Date().getTime()

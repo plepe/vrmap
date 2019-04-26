@@ -39,13 +39,13 @@ class Context {
 
   latlonFromWorldpos (pos) {
     if (!centerOffset) {
-      centerOffset = tileposFromLatlon(centerPos);
+      centerOffset = tileposFromLatlon(centerPos)
     }
 
     var xtilepos = pos.x / baseTileSize + baseTileID.x + centerOffset.x
     var ytilepos = pos.z / baseTileSize + baseTileID.y + centerOffset.y
 
-    var n = Math.pow(2, tileZoom);
+    var n = Math.pow(2, tileZoom)
 
     var latRad = Math.atan(Math.sinh(Math.PI * (1 - 2 * ytilepos / n)))
 
