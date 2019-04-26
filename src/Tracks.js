@@ -41,6 +41,6 @@ module.exports = class Tracks extends OverpassLayer {
   }
 
   removeFeature (feature, metaitem) {
-    global.items.appendChild(metaitem)
+    global.items.removeChild(metaitem)
   }
 }

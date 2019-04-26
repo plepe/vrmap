@@ -47,6 +47,10 @@ function load (callback) {
   )
 }
 
+global.clear = () => {
+  layers.forEach(layer => layer.clear())
+}
+
 function getBBox () {
   let cameraGeoJSON = pointToGeoJSON(cameraPos)
   let viewArea = {

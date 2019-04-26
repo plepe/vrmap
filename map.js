@@ -166,10 +166,9 @@ function toggleMenu(event) {
 
 function loadScene() {
   while (tiles.firstChild) { tiles.removeChild(tiles.firstChild); }
-  while (items.firstChild) { items.removeChild(items.firstChild); }
+  clear();
   document.querySelector("#cameraRig").object3D.position.set(0, 0, 0);
   loadGroundTiles();
-//  loadTrees();
 
   baseTileID = tileIDFromLatlon(centerPos)
 }

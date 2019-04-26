@@ -58,6 +58,14 @@ class OverpassFeatures {
 
   removeFeature (feature, data) {
   }
+
+  clear () {
+    for (let k in this.features) {
+      this.removeFeature(this.features[k].feature, this.features[k].data)
+    }
+
+    this.features = {}
+  }
 }
 
 module.exports = OverpassFeatures

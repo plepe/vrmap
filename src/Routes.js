@@ -140,7 +140,7 @@ class Route {
       }
     })
 
-    delete this.vehicles
+    this.vehicles = []
   }
 }
 
