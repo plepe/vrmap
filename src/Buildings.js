@@ -36,6 +36,11 @@ module.exports = class Buildings extends OverpassLayer {
       geom.geometry.coordinates = [ geom.geometry.coordinates ]
     }
 
+    if (geom.geometry.type !== 'Polygon') {
+      console.error('Buildings: can\'t handle geometry ' + geom.geometry.type + ', object ' + feature.id)
+      return
+    }
+
     let itemPos = geom.geometry.coordinates[0][0]
 
     var outerPoints = []
