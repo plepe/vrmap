@@ -1,5 +1,6 @@
 /* global AFRAME, THREE, OverpassFrontend, fetch, presetsFile, overpassFrontend, overpassURL */
 
+const yaml = require('yaml')
 const turf = require('@turf/turf')
 const async = {
   each: require('async/each')
@@ -47,16 +48,16 @@ window.onload = function () {
   })
 
   // Load location presets and subdialog.
-  fetch('config.json')
+  fetch('config.yml')
     .then((response) => {
       if (response.ok) {
-        return response.json()
+        return response.text()
       } else {
         throw new Error('HTTP Error ' + response.status)
       }
     })
     .then((config) => {
-      context.config = config
+      context.config = yaml.parse(config)
       let locationPresets = context.config.presets
       let presetSel = document.querySelector('#locationPresets')
       let menu = document.querySelector('#menu')
