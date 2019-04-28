@@ -1,5 +1,3 @@
-let tilesFromCenter = 3
-
 class Tiles {
   constructor (view) {
     this.view = view
@@ -16,8 +14,8 @@ class Tiles {
     let toHide = {}
     Object.assign(toHide, this.features)
 
-    for (let x = pos.x - tilesFromCenter; x <= pos.x + tilesFromCenter; x++) {
-      for (let y = pos.y - tilesFromCenter; y <= pos.y + tilesFromCenter; y++) {
+    for (let x = pos.x - this.view.config.tilesFromCenter; x <= pos.x + this.view.config.tilesFromCenter; x++) {
+      for (let y = pos.y - this.view.config.tilesFromCenter; y <= pos.y + this.view.config.tilesFromCenter; y++) {
         let id = x + '-' + y
         delete toHide[id]
 
