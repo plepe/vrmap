@@ -10,6 +10,11 @@ tileServer: https://tilecache.kairo.at/mapnik/
 
 tileZoom: 19
 
+### Settings ###
+# limit count of features which will be added to the view per tick for
+# performance reasons
+maxFeatureAddPerTick: 50
+
 ### Location presets ###
 presets:
 - title: Wien Westbahnhof
