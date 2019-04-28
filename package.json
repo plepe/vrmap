@@ -13,8 +13,11 @@
     "watchify": "^3.11.1"
   },
   "scripts": {
-    "build": "browserify src/index.js -o dist/vrmap.js",
+    "build": "npm run build-main && npm run build-worker",
+    "build-main": "browserify src/index.js -o dist/vrmap.js",
+    "build-worker": "browserify src/worker.js -o dist/vrmap-worker.js",
     "lint": "standard --fix src/*.js",
-    "watch": "watchify --debug src/index.js -o dist/vrmap.js -v"
+    "watch-main": "watchify --debug src/index.js -o dist/vrmap.js -v",
+    "watch-worker": "watchify --debug src/worker.js -o dist/vrmap-worker.js -v"
   }
 }

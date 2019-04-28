@@ -1,5 +1,3 @@
-const OverpassFrontend = require('overpass-frontend')
-
 class OverpassFeatures {
   constructor (view) {
     this.view = view
@@ -7,56 +5,27 @@ class OverpassFeatures {
     this.features = {}
   }
 
-  load (callback) {
-    let found = {}
-
-    if (this.request) {
-      this.request.abort()
-    }
-
-    if (!this.query) {
-      return console.error('You have to set this.query to an Overpass Query')
-    }
-
-    this.request = global.overpassFrontend.BBoxQuery(
-      this.query,
-      this.view.bbox,
-      {
-        properties: OverpassFrontend.GEOM | OverpassFrontend.MEMBERS | OverpassFrontend.TAGS
-      },
-      (err, feature) => {
-        if (err) {
-          return console.error(err)
-        }
-
-        if (!(feature.id in this.features)) {
-          this.features[feature.id] = {
-            feature,
-            data: this.addFeature(feature)
-          }
-        }
-
-        found[feature.id] = true
-      },
-      (err) => {
-        this.request = undefined
-
-        for (let k in this.features) {
-          if (!(k in found)) {
-            this.removeFeature(this.features[k].feature, this.features[k].data)
-            delete this.features[k]
-          }
-        }
-
-        callback(err)
-      }
-    )
+  update () {
   }
 
   addFeature (feature) {
   }
 
   removeFeature (feature, data) {
+  }
+
+  add (featureId, feature) {
+    this.features[featureId] = {
+      feature,
+      data: this.addFeature(feature)
+    }
+  }
+
+  remove (featureId) {
+    if (featureId in this.features) {
+      this.removeFeature(this.features[featureId].feature, this.features[featureId].data)
+      delete this.features[featureId]
+    }
   }
 
   clear () {

@@ -8,9 +8,8 @@ module.exports = class Tracks extends OverpassLayer {
     this.query = 'way[railway=tram]'
   }
 
-  addFeature (feature) {
-    let geojson = feature.GeoJSON()
-    let gauge = feature.tags.gauge || 1435
+  addFeature (geojson) {
+    let gauge = geojson.properties.gauge || 1435
 
     let metaitem = document.createElement('a-entity')
 
