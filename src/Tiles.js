@@ -4,7 +4,7 @@ class Tiles {
   constructor (view) {
     this.view = view
 
-    this.dom = document.querySelector("#tiles");
+    this.dom = document.querySelector('#tiles')
     this.features = {}
   }
 
@@ -36,20 +36,20 @@ class Tiles {
 
   addTile (relX, relY, id) {
     return new Promise((resolve, reject) => {
-      var tile = document.createElement("a-plane");
+      var tile = document.createElement('a-plane')
       this.features[id] = tile
-      tile.setAttribute("class", "tile");
-      tile.setAttribute("data-reltilex", relX);
-      tile.setAttribute("data-reltiley", relY);
-      tile.setAttribute("rotation", {x: -90, y: 0, z: 0});
-      tile.setAttribute("position", getPositionFromTilepos({x: relX, y: relY}, {x: 0.5, y: 0.5}));
-      tile.setAttribute("src", tileServer + tileZoom + "/" + (baseTileID.x + relX) + "/" + (baseTileID.y + relY) + ".png");
-      tile.setAttribute("width", baseTileSize);
-      tile.setAttribute("height", baseTileSize);
-      this.dom.appendChild(tile);
-      resolve();
+      tile.setAttribute('class', 'tile')
+      tile.setAttribute('data-reltilex', relX)
+      tile.setAttribute('data-reltiley', relY)
+      tile.setAttribute('rotation', { x: -90, y: 0, z: 0 })
+      tile.setAttribute('position', getPositionFromTilepos({ x: relX, y: relY }, { x: 0.5, y: 0.5 }))
+      tile.setAttribute('src', tileServer + tileZoom + '/' + (baseTileID.x + relX) + '/' + (baseTileID.y + relY) + '.png')
+      tile.setAttribute('width', baseTileSize)
+      tile.setAttribute('height', baseTileSize)
+      this.dom.appendChild(tile)
+      resolve()
       // reject("whatever the error");
-    });
+    })
   }
 
   removeTile (id) {
