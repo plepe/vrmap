@@ -248,7 +248,7 @@ AFRAME.registerComponent('camera-listener', {
 })
 
 function cameraListener (force = false) {
-  if (worldPos === undefined) {
+  if (worldPos === undefined || context === undefined || context.config === undefined) {
     return
   }
 
