@@ -12,7 +12,7 @@ class Tiles {
   }
 
   load (callback) {
-    let pos = tileIDFromLatlon(this.view.cameraPos)
+    let pos = this.view.tileIDFromLatlon(this.view.cameraPos)
     let toHide = {}
     Object.assign(toHide, this.features)
 
@@ -22,7 +22,7 @@ class Tiles {
         delete toHide[id]
 
         if (!(id in this.features)) {
-          this.addTile(x - baseTileID.x, y - baseTileID.y, id)
+          this.addTile(x - this.view.baseTileID.x, y - this.view.baseTileID.y, id)
         }
       }
     }
@@ -42,10 +42,10 @@ class Tiles {
       tile.setAttribute('data-reltilex', relX)
       tile.setAttribute('data-reltiley', relY)
       tile.setAttribute('rotation', { x: -90, y: 0, z: 0 })
-      tile.setAttribute('position', getPositionFromTilepos({ x: relX, y: relY }, { x: 0.5, y: 0.5 }))
-      tile.setAttribute('src', tileServer + tileZoom + '/' + (baseTileID.x + relX) + '/' + (baseTileID.y + relY) + '.png')
-      tile.setAttribute('width', baseTileSize)
-      tile.setAttribute('height', baseTileSize)
+      tile.setAttribute('position', this.view.getPositionFromTilepos({ x: relX, y: relY }, { x: 0.5, y: 0.5 }))
+      tile.setAttribute('src', tileServer + tileZoom + '/' + (this.view.baseTileID.x + relX) + '/' + (this.view.baseTileID.y + relY) + '.png')
+      tile.setAttribute('width', this.view.baseTileSize)
+      tile.setAttribute('height', this.view.baseTileSize)
       this.dom.appendChild(tile)
       resolve()
       // reject("whatever the error");

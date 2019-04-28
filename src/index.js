@@ -1,4 +1,4 @@
-/* global AFRAME, THREE, OverpassFrontend, fetch, presetsFile, centerPos, baseTileID, overpassFrontend, overpassURL, baseTileSize, tilesizeFromID */
+/* global AFRAME, THREE, OverpassFrontend, fetch, presetsFile, overpassFrontend, overpassURL */
 
 const turf = require('@turf/turf')
 const async = {
@@ -19,7 +19,8 @@ const modules = [
 let context
 let camera
 let cameraPos
-let worldPos, oldWorldPos
+let worldPos = new THREE.Vector3()
+let oldWorldPos
 let rotation, oldRotation
 let layers = []
 
@@ -28,6 +29,12 @@ let viewDistance = 500 // m
 let viewBuffer = 100 // m
 
 window.onload = function () {
+  context = new Context()
+
+  modules.forEach(Module => {
+    layers.push(new Module(context))
+  })
+
   overpassFrontend = new OverpassFrontend(overpassURL)
 
   // Close intro dialog on clicking its button.
@@ -101,28 +108,18 @@ window.onload = function () {
           })
           menuitem.addEventListener('click', event => {
             let preset = locationPresets[event.target.dataset.index]
-            centerPos.latitude = preset.latitude
-            centerPos.longitude = preset.longitude
-            loadScene()
+            loadScene(preset)
           })
           menu.appendChild(menuitem)
         }
       }
-      centerPos = { latitude: locationPresets[0].latitude,
-        longitude: locationPresets[0].longitude }
+      loadScene(locationPresets[0])
       presetSel.value = 0
-      locLatInput.value = centerPos.latitude
-      locLonInput.value = centerPos.longitude
+      locLatInput.value = locationPresets[0].latitude
+      locLonInput.value = locationPresets[0].longitude
       document.querySelector('#locationLoadButton').onclick = event => {
-        centerPos.latitude = locLatInput.valueAsNumber
-        centerPos.longitude = locLonInput.valueAsNumber
-        loadScene()
+        loadScene({ latitude: locLatInput.valueAsNumber, longitude: locLonInput.valueAsNumber })
       }
-
-      init()
-
-      // Load objects into scene.
-      loadScene()
     })
     .catch((reason) => { console.log(reason) })
 
@@ -153,6 +150,7 @@ window.onload = function () {
   global.map = document.querySelector('#map')
   global.tiles = document.querySelector('#tiles')
   global.items = document.querySelector('#items')
+  camera = document.querySelector('#head')
 }
 
 function toggleMenu (event) {
@@ -169,22 +167,6 @@ function toggleMenu (event) {
   }
 }
 
-function init () {
-  if (!context) {
-    context = new Context({
-      centerPos
-    })
-  }
-
-  modules.forEach(Module => {
-    layers.push(new Module(context))
-  })
-
-  camera = document.querySelector('#head')
-
-  worldPos = new THREE.Vector3()
-}
-
 function load (callback) {
   async.each(layers,
     (layer, callback) => layer.load(callback),
@@ -192,12 +174,9 @@ function load (callback) {
   )
 }
 
-function loadScene () {
+function loadScene (centerPos) {
   document.querySelector('#cameraRig').object3D.position.set(0, 0, 0)
-  context.centerPos = centerPos
-
-  baseTileID = context.tileIDFromLatlon(context.centerPos)
-  baseTileSize = tilesizeFromID(baseTileID)
+  context.setCenterPos(centerPos)
 
   clear()
   cameraListener(true)
