@@ -11,7 +11,7 @@ class Tiles {
   initScene () {
   }
 
-  load (callback) {
+  update () {
     let pos = this.view.tileIDFromLatlon(this.view.cameraPos)
     let toHide = {}
     Object.assign(toHide, this.features)
@@ -30,8 +30,6 @@ class Tiles {
     for (var k in toHide) {
       this.removeTile(k)
     }
-
-    callback()
   }
 
   addTile (relX, relY, id) {

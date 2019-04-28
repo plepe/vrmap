@@ -1,14 +1,11 @@
 /* global AFRAME, THREE, fetch */
 
-const OverpassFrontend = require('overpass-frontend')
 const yaml = require('yaml')
-const turf = require('@turf/turf')
 const async = {
   each: require('async/each')
 }
 
 const Context = require('./Context')
-const pointToGeoJSON = require('./pointToGeoJSON')
 require('./position-limit')
 
 const modules = [
@@ -16,7 +13,7 @@ const modules = [
   require('./Buildings'),
   require('./Trees'),
   require('./Tracks'),
-  require('./Routes')
+//  require('./Routes')
 ]
 
 let context
@@ -25,17 +22,23 @@ let cameraPos
 let worldPos = new THREE.Vector3()
 let oldWorldPos
 let rotation, oldRotation
-let layers = []
-
-let viewAngle = 70
-let viewDistance = 500 // m
-let viewBuffer = 100 // m
+let layers = {}
+let worker
 
 window.onload = function () {
   context = new Context()
 
-  modules.forEach(Module => {
-    layers.push(new Module(context))
+  worker = new Worker('dist/vrmap-worker.js')
+  worker.onmessage = workerRecv
+
+  modules.forEach((Module, id) => {
+    let layer = new Module(context)
+
+    if (layer.query) {
+      worker.postMessage({ fun: 'addLayer', id, query: layer.query })
+    }
+
+    layers[id] = layer
   })
 
   // Close intro dialog on clicking its button.
@@ -59,7 +62,10 @@ window.onload = function () {
     .then((config) => {
       context.config = yaml.parse(config)
 
-      global.overpassFrontend = new OverpassFrontend(context.config.overpassURL)
+      worker.postMessage({
+        fun: 'init',
+        config: context.config
+      })
 
       let locationPresets = context.config.presets
       let presetSel = document.querySelector('#locationPresets')
@@ -159,6 +165,15 @@ window.onload = function () {
   camera = document.querySelector('#head')
 }
 
+function workerRecv (e) {
+  switch (e.data.fun) {
+    case 'add':
+      return layers[e.data.id].add(e.data.featureId, e.data.feature)
+    case 'remove':
+      return layers[e.data.id].remove(e.data.featureId)
+  }
+}
+
 function toggleMenu (event) {
   console.log('menu pressed!')
   let menu = document.querySelector('#menu')
@@ -186,41 +201,25 @@ function loadScene (centerPos) {
 
   clear()
   cameraListener(true)
-  load(() => {})
 }
 
 function clear () {
-  layers.forEach(layer => layer.clear())
-}
-
-function getBBox () {
-  let cameraGeoJSON = pointToGeoJSON(cameraPos)
-  let viewArea = {
-    type: 'Feature',
-    geometry: {
-      type: 'Polygon',
-      coordinates: [ [
-        cameraGeoJSON.geometry.coordinates,
-        turf.transformTranslate(cameraGeoJSON, viewDistance / 1000, -cameraPos.heading + viewAngle / 2).geometry.coordinates,
-        turf.transformTranslate(cameraGeoJSON, viewDistance / 1000, -cameraPos.heading - viewAngle / 2).geometry.coordinates,
-        cameraGeoJSON.geometry.coordinates
-      ] ]
-    }
+  for (let k in layers) {
+    layers[k].clear()
   }
-
-  return turf.buffer(viewArea, viewBuffer / 1000)
 }
 
 function update () {
   context.cameraPos = cameraPos
-  context.viewArea = getBBox()
-  let bbox = turf.bbox(context.viewArea)
-  context.bbox.minlon = bbox[0]
-  context.bbox.minlat = bbox[1]
-  context.bbox.maxlon = bbox[2]
-  context.bbox.maxlat = bbox[3]
 
-  load(() => {})
+  worker.postMessage({
+    fun: 'cameraPos',
+    cameraPos: context.cameraPos
+  })
+
+  for (let k in layers) {
+    layers[k].update()
+  }
 }
 
 AFRAME.registerComponent('camera-listener', {

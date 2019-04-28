@@ -7,9 +7,9 @@ module.exports = class Trees extends OverpassLayer {
   }
 
   addFeature (feature) {
-    let itemPos = this.view.convertFromGeoJSON(feature.GeoJSON()).geometry.coordinates
+    let itemPos = this.view.convertFromGeoJSON(feature).geometry.coordinates
 
-    var tags = feature.tags || {}
+    var tags = feature.properties || {}
     var item = document.createElement('a-entity')
     item.setAttribute('class', 'tree')
     var trunk = document.createElement('a-entity')

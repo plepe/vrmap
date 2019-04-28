@@ -25,7 +25,7 @@ module.exports = class Buildings extends OverpassLayer {
   }
 
   addFeature (feature) {
-    let geom = this.view.convertFromGeoJSON(feature.GeoJSON())
+    let geom = this.view.convertFromGeoJSON(feature)
     if (!geom.geometry) {
       console.log(feature)
       return
@@ -88,7 +88,7 @@ module.exports = class Buildings extends OverpassLayer {
 }
 
 function getBuildingData (feature) {
-  var tags = feature.tags || {}
+  var tags = feature.properties || {}
   var btype = tags.building
   if (tags.shelter === 'yes') { btype = 'shelter' }
   if (ignoredTypes.includes(btype)) { return null }
