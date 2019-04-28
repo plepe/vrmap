@@ -1,5 +1,6 @@
-/* global AFRAME, THREE, OverpassFrontend, fetch, presetsFile, overpassFrontend, overpassURL */
+/* global AFRAME, THREE, fetch */
 
+const OverpassFrontend = require('overpass-frontend')
 const yaml = require('yaml')
 const turf = require('@turf/turf')
 const async = {
@@ -8,6 +9,7 @@ const async = {
 
 const Context = require('./Context')
 const pointToGeoJSON = require('./pointToGeoJSON')
+require('./position-limit')
 
 const modules = [
   require('./Tiles'),
@@ -36,8 +38,6 @@ window.onload = function () {
     layers.push(new Module(context))
   })
 
-  overpassFrontend = new OverpassFrontend(overpassURL)
-
   // Close intro dialog on clicking its button.
   document.querySelector('#introDialogCloseButton').onclick = event => {
     event.target.parentElement.parentElement.classList.add('hidden')
@@ -58,6 +58,9 @@ window.onload = function () {
     })
     .then((config) => {
       context.config = yaml.parse(config)
+
+      global.overpassFrontend = new OverpassFrontend(context.config.overpassURL)
+
       let locationPresets = context.config.presets
       let presetSel = document.querySelector('#locationPresets')
       let menu = document.querySelector('#menu')

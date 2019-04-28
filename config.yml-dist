@@ -1,4 +1,16 @@
 ---
+### Overpass Server ###
+overpassURL: https://overpass-api.de/api/interpreter
+
+### Background Map ###
+tileServer: https://tilecache.kairo.at/mapnik/
+# Alternatives
+# Basemap offers hires tiles for Austria.
+# tileServer: https://tilecache.kairo.at/basemaphires/
+
+tileZoom: 19
+
+### Location presets ###
 presets:
 - title: Wien Westbahnhof
   latitude: 48.19692

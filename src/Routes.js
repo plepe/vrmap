@@ -1,4 +1,5 @@
-/* global OverpassFrontend, overpassFrontend, AFRAME, THREE */
+/* global AFRAME, THREE */
+const OverpassFrontend = require('overpass-frontend')
 
 const turf = require('@turf/turf')
 const md5 = require('md5')
@@ -27,7 +28,7 @@ class Route {
       }
     )
 
-    overpassFrontend.get(
+    global.overpassFrontend.get(
       routeWayIds,
       {
         properties: OverpassFrontend.MEMBERS

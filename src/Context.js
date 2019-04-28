@@ -1,4 +1,3 @@
-/* global tileZoom */
 const BoundingBox = require('boundingbox')
 
 class Context {
@@ -15,7 +14,7 @@ class Context {
 
   tileIDFromLatlon (latlon) {
     /* Get tile x/y numbers from degree-based latitude/longitude values */
-    var n = Math.pow(2, tileZoom)
+    var n = Math.pow(2, this.config.tileZoom)
     var latRad = latlon.latitude / 180 * Math.PI
     var xtile = Math.floor(n * ((latlon.longitude + 180) / 360))
     var ytile = Math.floor(n * (1 - (Math.log(Math.tan(latRad) + 1 / Math.cos(latRad)) / Math.PI)) / 2)
@@ -24,10 +23,10 @@ class Context {
 
   tileposFromLatlon (latlon) {
     /* Get position x/z numbers from degree-based latitude/longitude values */
-    var n = Math.pow(2, tileZoom)
-    var lat_rad = latlon.latitude / 180 * Math.PI
+    var n = Math.pow(2, this.config.tileZoom)
+    var latRad = latlon.latitude / 180 * Math.PI
     var xtilepos = n * ((latlon.longitude + 180) / 360)
-    var ytilepos = n * (1 - (Math.log(Math.tan(lat_rad) + 1 / Math.cos(lat_rad)) / Math.PI)) / 2
+    var ytilepos = n * (1 - (Math.log(Math.tan(latRad) + 1 / Math.cos(latRad)) / Math.PI)) / 2
     return { x: xtilepos - this.baseTileID.x,
       y: ytilepos - this.baseTileID.y }
   }
@@ -37,7 +36,7 @@ class Context {
       this.centerOffset = this.tileposFromLatlon(this.centerPos)
     }
     /* Get position x/z numbers from degree-based latitude/longitude values */
-    var n = Math.pow(2, tileZoom)
+    var n = Math.pow(2, this.config.tileZoom)
     var latRad = latlon.latitude / 180 * Math.PI
     var xtilepos = n * ((latlon.longitude + 180) / 360)
     var ytilepos = n * (1 - (Math.log(Math.tan(latRad) + 1 / Math.cos(latRad)) / Math.PI)) / 2
@@ -57,7 +56,7 @@ class Context {
     var xtilepos = pos.x / this.baseTileSize + this.baseTileID.x + this.centerOffset.x
     var ytilepos = pos.z / this.baseTileSize + this.baseTileID.y + this.centerOffset.y
 
-    var n = Math.pow(2, tileZoom)
+    var n = Math.pow(2, this.config.tileZoom)
 
     var latRad = Math.atan(Math.sinh(Math.PI * (1 - 2 * ytilepos / n)))
 
@@ -139,9 +138,9 @@ class Context {
     /* Get a tile size in meters from x/y tile numbers */
     /* tileid is an object with x and y members telling the slippy map tile ID */
     var equatorSize = 40075016.686 // in meters
-    var n = Math.pow(2, tileZoom)
-    var lat_rad = Math.atan(Math.sinh(Math.PI * (1 - 2 * tileid.y / n)))
-    var tileSize = equatorSize * Math.cos(lat_rad) / n
+    var n = Math.pow(2, this.config.tileZoom)
+    var latRad = Math.atan(Math.sinh(Math.PI * (1 - 2 * tileid.y / n)))
+    var tileSize = equatorSize * Math.cos(latRad) / n
     return tileSize
   }
 
@@ -150,7 +149,7 @@ class Context {
       offset = { x: 0, y: 0 }
     }
     if (!this.centerOffset) {
-      this.centerOffset = tileposFromLatlon(centerPos)
+      this.centerOffset = this.tileposFromLatlon(this.centerPos)
     }
     return {
       x: this.baseTileSize * (tilepos.x + offset.x - this.centerOffset.x),

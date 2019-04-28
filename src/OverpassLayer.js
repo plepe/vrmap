@@ -1,4 +1,4 @@
-/* global OverpassFrontend, overpassFrontend */
+const OverpassFrontend = require('overpass-frontend')
 
 class OverpassFeatures {
   constructor (view) {
@@ -18,7 +18,7 @@ class OverpassFeatures {
       return console.error('You have to set this.query to an Overpass Query')
     }
 
-    this.request = overpassFrontend.BBoxQuery(
+    this.request = global.overpassFrontend.BBoxQuery(
       this.query,
       this.view.bbox,
       {
