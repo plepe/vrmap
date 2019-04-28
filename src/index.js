@@ -24,6 +24,8 @@ let oldWorldPos
 let rotation, oldRotation
 let layers = {}
 let worker
+let countAdd = 0
+let addQueue = []
 
 window.onload = function () {
   context = new Context()
@@ -168,7 +170,12 @@ window.onload = function () {
 function workerRecv (e) {
   switch (e.data.fun) {
     case 'add':
-      return layers[e.data.id].add(e.data.featureId, e.data.feature)
+      if (countAdd >= context.config.maxFeatureAddPerTick) {
+        return addQueue.push(e.data)
+      } else {
+        countAdd++
+        return layers[e.data.id].add(e.data.featureId, e.data.feature)
+      }
     case 'remove':
       return layers[e.data.id].remove(e.data.featureId)
   }
@@ -225,6 +232,18 @@ function update () {
 AFRAME.registerComponent('camera-listener', {
   tick () {
     cameraListener()
+  },
+
+  tock () {
+    if (context && context.config) {
+      while (countAdd < context.config.maxFeatureAddPerTick && addQueue.length) {
+        let data = addQueue.pop()
+        layers[data.id].add(data.featureId, data.feature)
+        countAdd++
+      }
+
+      countAdd = 0
+    }
   }
 })
 
