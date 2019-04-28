@@ -5,8 +5,8 @@ let centerOffset
 
 class Context {
   constructor (param) {
-    baseTileID = tileIDFromLatlon(centerPos);
-    baseTileSize = tilesizeFromID(baseTileID);
+    baseTileID = tileIDFromLatlon(centerPos)
+    baseTileSize = tilesizeFromID(baseTileID)
 
     for (var k in param) {
       this[k] = param[k]
