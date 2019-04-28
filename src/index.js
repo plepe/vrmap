@@ -47,7 +47,7 @@ window.onload = function () {
   })
 
   // Load location presets and subdialog.
-  fetch(presetsFile)
+  fetch('config.json')
     .then((response) => {
       if (response.ok) {
         return response.json()
@@ -55,7 +55,9 @@ window.onload = function () {
         throw new Error('HTTP Error ' + response.status)
       }
     })
-    .then((locationPresets) => {
+    .then((config) => {
+      context.config = config
+      let locationPresets = context.config.presets
       let presetSel = document.querySelector('#locationPresets')
       let menu = document.querySelector('#menu')
       let locLatInput = document.querySelector('#locLatitude')

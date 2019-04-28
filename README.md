@@ -29,3 +29,11 @@ General limitations:
    KaiRo's front door in Vienna, Austria.
  * Only a small area is loaded by default and no further data is added as you
    move around.
+
+## Installation
+```sh
+git clone https://github.com/plepe/vrmap
+cd vrmap
+npm install
+cp config.json-dist config.json
+```
