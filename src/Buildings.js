@@ -65,7 +65,7 @@ module.exports = class Buildings extends OverpassLayer {
 
   removeFeature (feature, item) {
     if (item) {
-      global.items.appendChild(item)
+      global.items.removeChild(item)
     }
   }
 
