@@ -62,7 +62,12 @@ window.onload = function () {
       }
     })
     .then((config) => {
-      context.config = yaml.parse(config)
+      try {
+        context.config = yaml.parse(config)
+      } catch (e) {
+        alert("Can't load config.yml:\n" + e)
+        return
+      }
 
       worker.postMessage({
         fun: 'init',
@@ -135,7 +140,9 @@ window.onload = function () {
         loadScene({ latitude: locLatInput.valueAsNumber, longitude: locLonInput.valueAsNumber })
       }
     })
-    .catch((reason) => { console.log(reason) })
+    .catch((reason) => {
+      alert("Can't load config.yml:\n" + reason + "\nDid you copy config.yml-dist to config.yml?")
+    })
 
   // Hook up menu button iside the VR.
   let leftHand = document.querySelector('#left-hand')
