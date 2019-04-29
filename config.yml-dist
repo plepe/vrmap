@@ -17,6 +17,11 @@ tilesFromCenter: 5
 # performance reasons
 maxFeatureAddPerTick: 50
 
+### Settings for Layers ###
+## Routes ##
+routeVehicleInterval: 60  # every n seconds
+routeVehicleSpeed: 0.005  # km/s
+
 ### Location presets ###
 presets:
 - title: Wien Westbahnhof

@@ -15,8 +15,8 @@ class Route {
     this.routeLength = feature.routeLength
 
     // settings
-    this.interval = 60 // every n seconds
-    this.speed = 0.005 // kilometer / second
+    this.interval = this.context.config.routeVehicleInterval || 60
+    this.speed = this.context.config.routeVehicleSpeed || 0.005
     this.color = this.feature.properties.color || '#' + md5(this.feature.properties.ref).slice(0, 6)
 
     this.vehicles = []
