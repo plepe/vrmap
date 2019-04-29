@@ -3,6 +3,7 @@ class OverpassFeatures {
     this.view = view
     this.request = undefined
     this.features = {}
+    this.workerModifier = []
   }
 
   update () {

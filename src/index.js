@@ -37,7 +37,7 @@ window.onload = function () {
     let layer = new Module(context)
 
     if (layer.query) {
-      worker.postMessage({ fun: 'addLayer', id, query: layer.query })
+      worker.postMessage({ fun: 'addLayer', id, query: layer.query, modifier: layer.workerModifier })
     }
 
     layers[id] = layer

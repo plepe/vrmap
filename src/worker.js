@@ -56,7 +56,7 @@ onmessage = (e) => {
       init(e.data.config)
       return
     case 'addLayer':
-      let layer = new OverpassLayerWorker(e.data.id, e.data.query)
+      let layer = new OverpassLayerWorker(e.data.id, e.data.query, e.data.modifier)
       layers[e.data.id] = layer
       return
     case 'cameraPos':

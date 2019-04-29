@@ -1,11 +1,18 @@
 const OverpassFrontend = require('overpass-frontend')
+const async = {
+  each: require('async/each')
+}
+
+modifierFunctions = {
+}
 
 class OverpassFeatures {
-  constructor (id, query) {
+  constructor (id, query, modifier) {
     this.request = undefined
     this.features = {}
     this.id = id
     this.query = query
+    this.modifier = modifier
   }
 
   load (bbox, callback) {
@@ -34,7 +41,14 @@ class OverpassFeatures {
           this.features[feature.id] = {
             feature
           }
-          postMessage({ fun: 'add', id: this.id, featureId: feature.id, feature: feature.GeoJSON() })
+
+          let ob = feature.GeoJSON()
+          async.each(this.modifier,
+            (modifier, callback) => modifierFunctions[modifier](ob, feature, callback),
+            (err) => {
+              postMessage({ fun: 'add', id: this.id, featureId: feature.id, feature: ob })
+            }
+          )
         }
 
         found[feature.id] = true
