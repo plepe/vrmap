@@ -37,3 +37,9 @@ cd vrmap
 npm install
 cp config.yml-dist config.yml
 ```
+
+## Development
+VRMap uses a main process and a worker thread, which have to be compiled separately. Using watch (watchify), the files will be compiled with debug information; also the compiled files will be updated when the source code changes.
+```sh
+npm run watch-main & npm run watch-worker & npm run start
+```
