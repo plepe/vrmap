@@ -36,16 +36,43 @@ module.exports = class Buildings extends OverpassLayer {
       geom.geometry.coordinates = [ geom.geometry.coordinates ]
     }
 
-    if (geom.geometry.type !== 'Polygon') {
+    let data = getBuildingData(feature)
+    if (data === null) {
+      return
+    }
+
+    let item
+    if (geom.geometry.type === 'Polygon') {
+      let itemPos = geom.geometry.coordinates[0][0]
+      item = this.toItem(geom.geometry.coordinates, data, itemPos)
+    } else if (geom.geometry.type === 'MultiPolygon') {
+      item = document.createElement('a-entity')
+      let itemPos = geom.geometry.coordinates[0][0][0]
+
+      for (let i = 0; i < geom.geometry.coordinates.length; i++) {
+        let subitem = this.toItem(geom.geometry.coordinates[i], data, itemPos)
+        item.appendChild(subitem)
+      }
+    } else {
       console.error('Buildings: can\'t handle geometry ' + geom.geometry.type + ', object ' + feature.id)
       return
     }
 
-    let itemPos = geom.geometry.coordinates[0][0]
+    global.items.appendChild(item)
 
+    return item
+  }
+
+  removeFeature (feature, item) {
+    if (item) {
+      global.items.appendChild(item)
+    }
+  }
+
+  toItem (coordinates, data, itemPos) {
     var outerPoints = []
     var innerWays = []
-    for (let way of geom.geometry.coordinates) {
+    for (let way of coordinates) {
       let wayPoints = []
       for (let tpos of way) {
         let ppos = this.view.getRelativePositionFromWorldpos(tpos, itemPos)
@@ -58,15 +85,11 @@ module.exports = class Buildings extends OverpassLayer {
       }
     }
 
-    let data = getBuildingData(feature)
-    if (data === null) {
-      return
-    }
-
     let item = document.createElement('a-entity')
     item.setAttribute('class', 'building')
 
-    let buildingProperties = data.properties
+    let buildingProperties = {}
+    Object.assign(buildingProperties, data.properties)
     buildingProperties.outerPoints = outerPoints
     if (innerWays.length) {
       buildingProperties.innerPaths = innerWays
@@ -75,15 +98,8 @@ module.exports = class Buildings extends OverpassLayer {
     item.setAttribute('geometry', buildingProperties)
     item.setAttribute('material', { color: data.color })
     item.setAttribute('position', itemPos)
-    global.items.appendChild(item)
 
     return item
-  }
-
-  removeFeature (feature, item) {
-    if (item) {
-      global.items.appendChild(item)
-    }
   }
 }
 
