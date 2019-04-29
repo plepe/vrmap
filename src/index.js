@@ -13,7 +13,7 @@ const modules = [
   require('./Buildings'),
   require('./Trees'),
   require('./Tracks'),
-//  require('./Routes')
+  require('./Routes')
 ]
 
 let context

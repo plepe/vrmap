@@ -47,7 +47,7 @@ function setCameraPos (cameraPos) {
 function init (_config) {
   config = _config
 
-  overpassFrontend = new OverpassFronted(config.overpassURL)
+  global.overpassFrontend = new OverpassFronted(config.overpassURL)
 }
 
 onmessage = (e) => {

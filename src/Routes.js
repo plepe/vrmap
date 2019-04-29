@@ -1,6 +1,4 @@
 /* global AFRAME, THREE */
-const OverpassFrontend = require('overpass-frontend')
-
 const turf = require('@turf/turf')
 const md5 = require('md5')
 
@@ -13,57 +11,13 @@ class Route {
     this.feature = feature
     this.context = context
 
+    this.routeJsonFeature = feature.routeJsonFeature
+    this.routeLength = feature.routeLength
+
     // settings
     this.interval = 60 // every n seconds
     this.speed = 0.005 // kilometer / second
-    this.color = this.feature.tags.color || '#' + md5(this.feature.tags.ref).slice(0, 6)
-
-    // make sure that all route members are fully loaded (including connections to prev/next way)
-    let routeWayIds = []
-    feature.members.forEach(
-      member => {
-        if (member.role === '' && member.type === 'way') {
-          routeWayIds.push(member.id)
-        }
-      }
-    )
-
-    global.overpassFrontend.get(
-      routeWayIds,
-      {
-        properties: OverpassFrontend.MEMBERS
-      },
-      () => {},
-      () => this.init()
-    )
-  }
-
-  init () {
-    let routeFeatures = []
-    let routeGeom = []
-
-    this.feature.members.forEach(
-      member => {
-        if (member.role === '' && member.type === 'way') {
-          routeFeatures.push(member)
-
-          if (member.dir === 'backward') {
-            routeGeom = routeGeom.concat(member.geometry.reverse().slice(member.connectedPrev === 'no' ? 0 : 1))
-          } else {
-            routeGeom = routeGeom.concat(member.geometry.slice(member.connectedPrev === 'no' ? 0 : 1))
-          }
-        }
-      }
-    )
-
-    this.routeJsonFeature = {
-      type: 'Feature',
-      geometry: {
-        type: 'LineString',
-        coordinates: routeGeom.map(pos => [ pos.lon, pos.lat ])
-      }
-    }
-    this.routeLength = turf.length(this.routeJsonFeature)
+    this.color = this.feature.properties.color || '#' + md5(this.feature.properties.ref).slice(0, 6)
 
     this.vehicles = []
   }
@@ -155,6 +109,7 @@ module.exports = class Routes extends OverpassLayer {
     super(view)
     window.setInterval(() => this.update(), 20)
     this.query = 'relation[route=tram]'
+    this.workerModifier.push('routeWays')
   }
 
   addFeature (feature) {
