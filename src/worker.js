@@ -4,12 +4,7 @@ const turf = require('@turf/turf')
 const OverpassLayerWorker = require('./OverpassLayerWorker')
 const pointToGeoJSON = require('./pointToGeoJSON')
 
-let config
 let layers = {}
-
-let viewAngle = 70
-let viewDistance = 500 // m
-let viewBuffer = 100 // m
 
 function getBBox (cameraPos) {
   let cameraGeoJSON = pointToGeoJSON(cameraPos)
@@ -19,14 +14,14 @@ function getBBox (cameraPos) {
       type: 'Polygon',
       coordinates: [ [
         cameraGeoJSON.geometry.coordinates,
-        turf.transformTranslate(cameraGeoJSON, viewDistance / 1000, -cameraPos.heading + viewAngle / 2).geometry.coordinates,
-        turf.transformTranslate(cameraGeoJSON, viewDistance / 1000, -cameraPos.heading - viewAngle / 2).geometry.coordinates,
+        turf.transformTranslate(cameraGeoJSON, config.viewDistance / 1000, -cameraPos.heading + config.viewAngle / 2).geometry.coordinates,
+        turf.transformTranslate(cameraGeoJSON, config.viewDistance / 1000, -cameraPos.heading - config.viewAngle / 2).geometry.coordinates,
         cameraGeoJSON.geometry.coordinates
       ] ]
     }
   }
 
-  return turf.buffer(viewArea, viewBuffer / 1000)
+  return turf.buffer(viewArea, config.viewBuffer / 1000)
 }
 
 function setCameraPos (cameraPos) {

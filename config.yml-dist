@@ -17,6 +17,16 @@ tilesFromCenter: 5
 # performance reasons
 maxFeatureAddPerTick: 50
 
+# Map objects will be loaded in direction of the view from the camera point.
+# The area calculates via these three parameters:
+# viewAngle: span a triangle from the camera point
+# viewDistance: max. distance from the eye
+# viewBuffer: an additional area around the triangle (include objects in the
+#   back)
+viewAngle: 50
+viewDistance: 300 # Meters
+viewBuffer: 70 # Meters
+
 ### Settings for Layers ###
 ## Routes ##
 routeVehicleInterval: 60  # every n seconds
