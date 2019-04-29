@@ -48,6 +48,6 @@ module.exports = class Trees extends OverpassLayer {
   }
 
   removeFeature (feature, item) {
-    global.items.appendChild(item)
+    global.items.removeChild(item)
   }
 }
