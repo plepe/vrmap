@@ -115,6 +115,21 @@ class Context {
             )
           }
           break
+        case 'MultiPolygon':
+          result.geometry = {
+            type: feature.geometry.type,
+            coordinates: feature.geometry.coordinates.map(
+              poly => poly.map(
+                coord => coord.map(
+                  pos => this.worldposFromLatlon({
+                    longitude: pos[0],
+                    latitude: pos[1]
+                  })
+                )
+              )
+            )
+          }
+          break
         case 'GeometryCollection':
           result.geometries = {
             type: feature.geometry.type,
