@@ -35,11 +35,19 @@ General limitations:
 git clone https://github.com/plepe/vrmap
 cd vrmap
 npm install
+npm run build
 cp config.yml-dist config.yml
+npm run start
 ```
+
+Browse to http://localhost:3000
 
 ## Development
 VRMap uses a main process and a worker thread, which have to be compiled separately. Using watch (watchify), the files will be compiled with debug information; also the compiled files will be updated when the source code changes.
 ```sh
 npm run watch-main & npm run watch-worker & npm run start
 ```
+
+Browse to http://localhost:3000
+
+Open the developer tools of your browser for debug messages.
