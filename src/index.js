@@ -8,13 +8,13 @@ const async = {
 const Context = require('./Context')
 require('./position-limit')
 
-const modules = [
-  require('./Tiles'),
-  require('./Buildings'),
-  require('./Trees'),
-  require('./Tracks'),
-  require('./Routes')
-]
+const modules = {
+  tiles: require('./Tiles'),
+  buildings: require('./Buildings'),
+  trees: require('./Trees'),
+  tracks: require('./Tracks'),
+  routes: require('./Routes')
+}
 
 let context
 let camera
@@ -32,16 +32,6 @@ window.onload = function () {
 
   worker = new Worker('dist/vrmap-worker.js')
   worker.onmessage = workerRecv
-
-  modules.forEach((Module, id) => {
-    let layer = new Module(context)
-
-    if (layer.query) {
-      worker.postMessage({ fun: 'addLayer', id, query: layer.query, modifier: layer.workerModifier })
-    }
-
-    layers[id] = layer
-  })
 
   // Close intro dialog on clicking its button.
   document.querySelector('#introDialogCloseButton').onclick = event => {
@@ -73,6 +63,19 @@ window.onload = function () {
         fun: 'init',
         config: context.config
       })
+
+      for (let id in modules) {
+        if (context.config.modules.includes(id)) {
+          let Module = modules[id]
+          let layer = new Module(context)
+
+          if (layer.query) {
+            worker.postMessage({ fun: 'addLayer', id, query: layer.query, modifier: layer.workerModifier })
+          }
+
+          layers[id] = layer
+        }
+      }
 
       let locationPresets = context.config.presets
       let presetSel = document.querySelector('#locationPresets')

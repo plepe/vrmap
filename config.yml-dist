@@ -28,6 +28,14 @@ viewDistance: 300 # Meters
 viewBuffer: 70 # Meters
 
 ### Settings for Layers ###
+# Which modules should be loaded (uncomment to disable modules)
+modules:
+- tiles     # background tiles
+- buildings
+- trees
+- tracks
+- routes    # moving vehicles on tram routes
+
 ## Routes ##
 routeVehicleInterval: 60  # every n seconds
 routeVehicleSpeed: 0.005  # km/s
