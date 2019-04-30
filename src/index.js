@@ -18,6 +18,7 @@ const modules = [
 
 let context
 let camera
+let cameraRig
 let cameraPos
 let worldPos = new THREE.Vector3()
 let oldWorldPos
@@ -172,6 +173,7 @@ window.onload = function () {
   global.tiles = document.querySelector('#tiles')
   global.items = document.querySelector('#items')
   camera = document.querySelector('#head')
+  cameraRig = document.querySelector('#cameraRig')
 }
 
 function workerRecv (e) {
@@ -210,7 +212,8 @@ function load (callback) {
 }
 
 function loadScene (centerPos) {
-  document.querySelector('#cameraRig').object3D.position.set(0, 0, 0)
+  cameraRig.object3D.position.set(0, centerPos.height || 0, 0)
+  cameraRig.setAttribute('rotation', { x: 0, y: -(centerPos.heading || 0) })
   context.setCenterPos(centerPos)
 
   clear()
@@ -262,6 +265,8 @@ function cameraListener (force = false) {
   worldPos.setFromMatrixPosition(camera.object3D.matrixWorld)
 
   rotation = camera.getAttribute('rotation')
+  let cameraRigRotation = cameraRig.getAttribute('rotation')
+  rotation.y += cameraRigRotation.y
   const newWorldPos = AFRAME.utils.coordinates.stringify(worldPos)
   const newRotation = AFRAME.utils.coordinates.stringify(rotation)
 
