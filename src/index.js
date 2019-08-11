@@ -8,13 +8,7 @@ const async = {
 const Context = require('./Context')
 require('./position-limit')
 
-const modules = {
-  tiles: require('./Tiles'),
-  buildings: require('./Buildings'),
-  trees: require('./Trees'),
-  tracks: require('./Tracks'),
-  routes: require('./Routes')
-}
+const modules = require('./modules')
 
 let context
 let camera
