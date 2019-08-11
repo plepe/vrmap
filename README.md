@@ -35,7 +35,6 @@ General limitations:
 git clone https://github.com/plepe/vrmap
 cd vrmap
 npm install
-npm run build
 cp config.yml-dist config.yml
 npm run start
 ```

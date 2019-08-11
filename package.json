@@ -20,6 +20,7 @@
     "lint": "standard --fix src/*.js",
     "start": "http-server ./ -p 3000",
     "watch-main": "watchify --debug src/index.js -o dist/vrmap.js -v",
-    "watch-worker": "watchify --debug src/worker.js -o dist/vrmap-worker.js -v"
+    "watch-worker": "watchify --debug src/worker.js -o dist/vrmap-worker.js -v",
+    "install": "npm run build"
   }
 }
