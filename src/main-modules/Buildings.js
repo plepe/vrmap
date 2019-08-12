@@ -1,5 +1,5 @@
 /* global AFRAME, THREE */
-const OverpassLayer = require('./OverpassLayer')
+const OverpassLayer = require('../OverpassLayer')
 
 var metersPerLevel = 3
 var roofOnlyTypes = ['roof', 'carport', 'grandstand']

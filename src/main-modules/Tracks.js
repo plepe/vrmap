@@ -1,6 +1,6 @@
 const turf = require('@turf/turf')
 
-const OverpassLayer = require('./OverpassLayer')
+const OverpassLayer = require('../OverpassLayer')
 
 module.exports = class Tracks extends OverpassLayer {
   constructor (view) {

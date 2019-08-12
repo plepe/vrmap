@@ -1,4 +1,4 @@
-const OverpassLayer = require('./OverpassLayer')
+const OverpassLayer = require('../OverpassLayer')
 
 module.exports = class Trees extends OverpassLayer {
   constructor (view) {

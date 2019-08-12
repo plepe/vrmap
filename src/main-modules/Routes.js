@@ -2,7 +2,7 @@
 const turf = require('@turf/turf')
 const md5 = require('md5')
 
-const OverpassLayer = require('./OverpassLayer')
+const OverpassLayer = require('../OverpassLayer')
 
 let routes = []
 
