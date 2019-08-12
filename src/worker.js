@@ -1,8 +1,9 @@
 const OverpassFronted = require('overpass-frontend')
 const turf = require('@turf/turf')
 
-const OverpassLayerWorker = require('./OverpassLayerWorker')
 const pointToGeoJSON = require('./pointToGeoJSON')
+
+const modules = require('./worker-modules/all')
 
 let layers = {}
 
@@ -51,7 +52,8 @@ onmessage = (e) => {
       init(e.data.config)
       return
     case 'addLayer':
-      let layer = new OverpassLayerWorker(e.data.id, e.data.query, e.data.modifier)
+      let Module = modules[id]
+      let layer = new Module(e.data.id, e.data.query, e.data.modifier)
       layers[e.data.id] = layer
       return
     case 'cameraPos':

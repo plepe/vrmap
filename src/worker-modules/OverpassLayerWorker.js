@@ -4,7 +4,7 @@ const async = {
 }
 
 modifierFunctions = {
-  routeWays: require('./routeWays')
+//  routeWays: require('./routeWays')
 }
 
 class OverpassFeatures {
