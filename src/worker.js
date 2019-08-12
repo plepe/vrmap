@@ -52,7 +52,7 @@ onmessage = (e) => {
       init(e.data.config)
       return
     case 'addLayer':
-      let Module = modules[id]
+      let Module = modules[e.data.id]
       let layer = new Module(e.data.id, e.data.query, e.data.modifier)
       layers[e.data.id] = layer
       return

@@ -1,7 +1,7 @@
 module.exports = {
-//  tiles: require('./Tiles'),
-//  buildings: require('./Buildings'),
+  tiles: require('./Tiles'),
+  buildings: require('./Buildings'),
   trees: require('./Trees'),
-//  tracks: require('./Tracks'),
-//  routes: require('./Routes')
+  tracks: require('./Tracks'),
+  routes: require('./Routes')
 }
