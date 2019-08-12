@@ -15,16 +15,15 @@ class OverpassFeatures {
   removeFeature (feature, data) {
   }
 
-  add (featureId, feature) {
+  add (featureId, geometry, options) {
     this.features[featureId] = {
-      feature,
-      data: this.addFeature(feature)
+      data: this.addFeature(geometry, options)
     }
   }
 
   remove (featureId) {
     if (featureId in this.features) {
-      this.removeFeature(this.features[featureId].feature, this.features[featureId].data)
+      this.removeFeature(this.features[featureId].data)
       delete this.features[featureId]
     }
   }

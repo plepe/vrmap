@@ -1,11 +1,13 @@
 const OverpassFronted = require('overpass-frontend')
 const turf = require('@turf/turf')
 
+const Context = require('./Context')
 const pointToGeoJSON = require('./pointToGeoJSON')
 
 const modules = require('./worker-modules/all')
 
 let layers = {}
+let context = new Context()
 
 function getBBox (cameraPos) {
   let cameraGeoJSON = pointToGeoJSON(cameraPos)
@@ -15,14 +17,14 @@ function getBBox (cameraPos) {
       type: 'Polygon',
       coordinates: [ [
         cameraGeoJSON.geometry.coordinates,
-        turf.transformTranslate(cameraGeoJSON, config.viewDistance / 1000, -cameraPos.heading + config.viewAngle / 2).geometry.coordinates,
-        turf.transformTranslate(cameraGeoJSON, config.viewDistance / 1000, -cameraPos.heading - config.viewAngle / 2).geometry.coordinates,
+        turf.transformTranslate(cameraGeoJSON, context.config.viewDistance / 1000, -cameraPos.heading + context.config.viewAngle / 2).geometry.coordinates,
+        turf.transformTranslate(cameraGeoJSON, context.config.viewDistance / 1000, -cameraPos.heading - context.config.viewAngle / 2).geometry.coordinates,
         cameraGeoJSON.geometry.coordinates
       ] ]
     }
   }
 
-  return turf.buffer(viewArea, config.viewBuffer / 1000)
+  return turf.buffer(viewArea, context.config.viewBuffer / 1000)
 }
 
 function setCameraPos (cameraPos) {
@@ -41,9 +43,9 @@ function setCameraPos (cameraPos) {
 }
 
 function init (_config) {
-  config = _config
+  context.config = _config
 
-  global.overpassFrontend = new OverpassFronted(config.overpassURL)
+  global.overpassFrontend = new OverpassFronted(context.config.overpassURL)
 }
 
 onmessage = (e) => {
@@ -53,9 +55,11 @@ onmessage = (e) => {
       return
     case 'addLayer':
       let Module = modules[e.data.id]
-      let layer = new Module(e.data.id, e.data.query, e.data.modifier)
+      let layer = new Module(e.data.id, e.data.query, context)
       layers[e.data.id] = layer
       return
+    case 'setCenterPos':
+      return context.setCenterPos(e.data.centerPos)
     case 'cameraPos':
       return setCameraPos(e.data.cameraPos)
   }

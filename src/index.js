@@ -138,7 +138,7 @@ window.onload = function () {
       }
     })
     .catch((reason) => {
-      alert("Can't load config.yml:\n" + reason + "\nDid you copy config.yml-dist to config.yml?")
+      alert("Can't load config.yml:\n" + reason + '\nDid you copy config.yml-dist to config.yml?')
     })
 
   // Hook up menu button iside the VR.
@@ -178,7 +178,7 @@ function workerRecv (e) {
         return addQueue.push(e.data)
       } else {
         countAdd++
-        return layers[e.data.id].add(e.data.featureId, e.data.feature)
+        return layers[e.data.id].add(e.data.featureId, e.data.geometry, e.data.options)
       }
     case 'remove':
       return layers[e.data.id].remove(e.data.featureId)
@@ -209,6 +209,10 @@ function load (callback) {
 function loadScene (centerPos) {
   document.querySelector('#cameraRig').object3D.position.set(0, 0, 0)
   context.setCenterPos(centerPos)
+  worker.postMessage({
+    fun: 'setCenterPos',
+    centerPos: centerPos
+  })
 
   clear()
   cameraListener(true)
@@ -242,7 +246,7 @@ AFRAME.registerComponent('camera-listener', {
     if (context && context.config) {
       while (countAdd < context.config.maxFeatureAddPerTick && addQueue.length) {
         let data = addQueue.pop()
-        layers[data.id].add(data.featureId, data.feature)
+        layers[data.id].add(data.featureId, data.geometry, data.options)
         countAdd++
       }
 

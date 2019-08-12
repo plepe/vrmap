@@ -3,17 +3,13 @@ const async = {
   each: require('async/each')
 }
 
-modifierFunctions = {
-//  routeWays: require('./routeWays')
-}
-
 class OverpassFeatures {
-  constructor (id, query, modifier) {
+  constructor (id, query, view) {
     this.request = undefined
     this.features = {}
     this.id = id
     this.query = query
-    this.modifier = modifier
+    this.view = view
   }
 
   load (bbox, callback) {
@@ -43,13 +39,9 @@ class OverpassFeatures {
             feature
           }
 
-          let ob = feature.GeoJSON()
-          async.each(this.modifier,
-            (modifier, callback) => modifierFunctions[modifier](ob, feature, callback),
-            (err) => {
-              postMessage({ fun: 'add', id: this.id, featureId: feature.id, feature: ob })
-            }
-          )
+          let geojson = feature.GeoJSON()
+          let { geometry, options } = this.calc(geojson, feature)
+          postMessage({ fun: 'add', id: this.id, featureId: feature.id, geometry, options })
         }
 
         found[feature.id] = true
