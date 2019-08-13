@@ -39,8 +39,7 @@ class OverpassFeatures {
             feature
           }
 
-          let geojson = feature.GeoJSON()
-          let { geometry, options } = this.calc(geojson, feature)
+          let { geometry, options } = this.calc(feature)
           postMessage({ fun: 'add', id: this.id, featureId: feature.id, geometry, options })
         }
 

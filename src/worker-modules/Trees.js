@@ -1,7 +1,7 @@
 const OverpassLayerWorker = require('../OverpassLayerWorker')
 
 module.exports = class Trees extends OverpassLayerWorker {
-  calc (ob, feature) {
+  calc (feature) {
     let geometry = this.view.convertFromGeoJSON(feature.GeoJSON()).geometry.coordinates
     let tags = feature.tags
 
