@@ -3,6 +3,8 @@ const async = {
   each: require('async/each')
 }
 
+const queueMessage = require('./queueMessage')
+
 class OverpassFeatures {
   constructor (id, query, view) {
     this.request = undefined
@@ -40,7 +42,7 @@ class OverpassFeatures {
           }
 
           let { geometry, options } = this.calc(feature)
-          postMessage({ fun: 'add', id: this.id, featureId: feature.id, geometry, options })
+          queueMessage({ fun: 'add', id: this.id, featureId: feature.id, geometry, options })
         }
 
         found[feature.id] = true
