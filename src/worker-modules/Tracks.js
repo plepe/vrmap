@@ -5,7 +5,7 @@ const OverpassLayerWorker = require('../OverpassLayerWorker')
 module.exports = class Tracks extends OverpassLayerWorker {
   calc (feature) {
     let options = {}
-    let geometry = { left: null, right: null }
+    let geometry = { left: null, right: null, segments: 0 }
 
     let gauge = feature.tags.gauge || 1435
     let geojson = feature.GeoJSON()
@@ -17,6 +17,8 @@ module.exports = class Tracks extends OverpassLayerWorker {
     shifted = turf.lineOffset(geojson, -gauge / 2000, { units: 'meters' })
     geom = this.view.convertFromGeoJSON(shifted)
     geometry.left = geom.geometry.coordinates.map(pos => pos.x + ' 0 ' + pos.z).join(', ')
+
+    geometry.segments = geojson.geometry.coordinates.length
 
     return { geometry, options }
   }
